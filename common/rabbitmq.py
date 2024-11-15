@@ -1,6 +1,6 @@
 import pika
 import json
-from app.crud.menu_crud import toggle_coffee_availability
+from menu_service.app.menu_crud import toggle_coffee_availability
 from sqlalchemy.orm import Session
 
 RABBITMQ_HOST = "51.250.26.59"

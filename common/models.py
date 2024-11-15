@@ -2,16 +2,10 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
+
 Base = declarative_base()
 
-# Таблица связей многие ко многим между кофе и кофейнями
-class CoffeeOfShop(Base):
-    __tablename__ = 'coffee_of_shop'
 
-    coffee_id = Column(Integer, ForeignKey('coffee.id'), primary_key=True)
-    coffee_shop_id = Column(Integer, ForeignKey('coffee_shops.id'), primary_key=True)
-
-# Модель кофейни
 class CoffeeShop(Base):
     __tablename__ = 'coffee_shops'
 
@@ -26,7 +20,14 @@ class CoffeeShop(Base):
     def __repr__(self):
         return f"<CoffeeShop(name={self.name}, location={self.location})>"
 
-# Модель кофе
+
+class CoffeeOfShop(Base):
+    __tablename__ = 'coffee_of_shop'
+
+    coffee_id = Column(Integer, ForeignKey('coffee.id'), primary_key=True)
+    coffee_shop_id = Column(Integer, ForeignKey('coffee_shops.id'), primary_key=True)
+
+
 class Coffee(Base):
     __tablename__ = 'coffee'
 

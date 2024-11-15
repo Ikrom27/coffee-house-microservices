@@ -21,6 +21,3 @@ def show_current_database():
         result = connection.execute(text("SELECT current_database();"))
         database_name = result.fetchone()[0]
         print(f"Подключено к базе данных: {database_name}")
-
-# Выводим имя базы данных при старте
-show_current_database()
