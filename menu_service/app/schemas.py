@@ -14,7 +14,6 @@ class CoffeeResponse(BaseModel):
     description: str
     price: int
     is_available: bool
-    coffee_shops: List[int]
 
     class Config:
         orm_mode = True

@@ -1,11 +1,10 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
-from coffee_shop_service.app.schemas import CoffeeShopCreate
+import schemas
 from common.models import CoffeeShop, CoffeeOfShop
 
 
-def create_coffee_shop(db: Session, coffee_shop: CoffeeShopCreate) -> CoffeeShop:
+def create_coffee_shop(db: Session, coffee_shop: schemas.CoffeeShopCreate) -> CoffeeShop:
     db_coffee_shop = CoffeeShop(name=coffee_shop.name, location=coffee_shop.location)
     db.add(db_coffee_shop)
     db.commit()
@@ -41,6 +40,14 @@ def remove_coffee_from_shop(db: Session, coffee_id: int, coffee_shop_id: int):
         db.delete(coffee_of_shop)
         db.commit()
 
+
+def toggle_coffee_shop_availability(db: Session, coffee_shop_id: int, available: bool):
+    coffee_shop = db.query(CoffeeShop).filter(CoffeeShop.id == coffee_shop_id).first()
+    if coffee_shop:
+        coffee_shop.is_active = available
+        db.commit()
+        db.refresh(coffee_shop)
+    return coffee_shop
 
 # uvicorn coffee_shop_service.app.main:app --reload --host 0.0.0.0 --port 8000
 # uvicorn menu_service.app.main:app --reload --host 0.0.0.0 --port 8001

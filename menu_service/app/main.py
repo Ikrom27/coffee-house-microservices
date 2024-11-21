@@ -3,9 +3,11 @@ import threading
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from common.database import engine, Base as AppBase, get_db
-from common.rabbitmq import consume_messages
-from menu_service.app import schemas
-from menu_service.app import menu_crud
+from common.models import Coffee
+from common.models import *
+from rabbitmq import consume_messages
+import schemas
+import menu_crud
 
 app = FastAPI()
 
@@ -24,6 +26,32 @@ threading.Thread(target=start_rabbitmq_consumer, daemon=True).start()
 @app.post("/coffees", response_model=schemas.CoffeeResponse)
 def add_coffee(coffee: schemas.CoffeeCreate, db: Session = Depends(get_db)):
     return menu_crud.create_coffee(db, coffee)
+
+
+@app.post("/coffees/{coffee_id}/block")
+def block_coffee(coffee_id: int, db: Session = Depends(get_db)):
+    coffee = menu_crud.toggle_coffee_availability(db, coffee_id, False)
+    if coffee:
+        return {"message": "Кофе успешно заблокирован", "coffee": coffee}
+    return {"error": "Кофе не найден"}
+
+
+@app.post("/coffees/{coffee_id}/unblock")
+def unblock_coffee(coffee_id: int, db: Session = Depends(get_db)):
+    coffee = menu_crud.toggle_coffee_availability(db, coffee_id, True)
+    if coffee:
+        return {"message": "Кофе успешно разблокирован", "coffee": coffee}
+    return {"error": "Кофе не найден"}
+
+
+@app.delete("/coffees/{coffee_id}")
+def delete_coffee(coffee_id: int, db: Session = Depends(get_db)):
+    coffee = db.query(Coffee).filter(Coffee.id == coffee_id).first()
+    if coffee:
+        db.delete(coffee)
+        db.commit()
+        return {"message": "Кофе успешно удален"}
+    return {"error": "Кофе не найден"}
 
 
 @app.get("/coffees", response_model=list[schemas.CoffeeResponse])

@@ -12,7 +12,6 @@ class CoffeeShopResponse(BaseModel):
     name: str
     location: str
     is_active: bool
-    coffees: List[int]
 
     class Config:
         orm_mode = True

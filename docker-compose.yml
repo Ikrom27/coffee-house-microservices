@@ -1,0 +1,51 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:13
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: coffee_house_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  coffee_shop_service:
+    build:
+      context: ./coffee_shop_service
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/coffee_house_db"
+    depends_on:
+      - db
+    volumes:
+      - ./common:/app/common
+    networks:
+      - app-network
+
+  menu_service:
+    build:
+      context: ./menu_service
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/coffee_house_db"
+    depends_on:
+      - db
+    volumes:
+      - ./common:/app/common
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
